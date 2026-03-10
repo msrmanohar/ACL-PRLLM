@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Telugu Prompt-Style Recovery — clean rewrite
-Python 3.12 + PyTorch 2.10 + Transformers 4.40
-Run: /opt/homebrew/Caskroom/miniforge/base/bin/python3 telugu_style_fixed.py
-"""
 import os, random, warnings
 warnings.filterwarnings("ignore")
 import numpy as np
@@ -40,17 +34,15 @@ VALID_LABELS = [
     "Humorous","Serious","Inspiring","Authoritative","Persuasive",
 ]
 
-# ── device (force CPU — MPS has gradient bugs) ───────────────────
 DEVICE = torch.device("cpu")
 print(f"Device: {DEVICE}")
 
 random.seed(42); np.random.seed(42); torch.manual_seed(42)
 
-# ── tokeniser ────────────────────────────────────────────────────
+
 print("Loading tokeniser...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
-# ── helpers ──────────────────────────────────────────────────────
 def clean(v):
     return str(v).strip() if v is not None else ""
 
@@ -82,7 +74,6 @@ def load(path, labeled=True):
     print(f"  {len(df)} rows loaded")
     return df
 
-# ── tokenise: original + changed as sentence pair ────────────────
 def tokenise_batch(originals, changeds):
     """Tokenise a batch of (original, changed) pairs."""
     return tokenizer(
@@ -112,12 +103,12 @@ def make_tensors(df):
 def make_loader(ds, shuffle=False):
     return DataLoader(ds, batch_size=BATCH_SIZE, shuffle=shuffle, num_workers=0)
 
-# ── model ────────────────────────────────────────────────────────
+
 def build_model(n):
     return AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME, num_labels=n, ignore_mismatched_sizes=True).to(DEVICE)
 
-# ── two-phase training ───────────────────────────────────────────
+
 def phase1_warmup(model, loader, warmup_epochs=3):
     """No-op: warmup disabled, using discriminative LR instead."""
     pass
@@ -137,7 +128,6 @@ def get_optimizer(model):
         ]
     return AdamW(pg(classifier, 1e-3) + pg(top_layers, 3e-5) + pg(rest, 1e-5))
 
-# ── training ─────────────────────────────────────────────────────
 def train_fold(tr_df, va_df, fold, le):
     print(f"\n{'='*55}\n  FOLD {fold}  train={len(tr_df)}  val={len(va_df)}\n{'='*55}")
     train_loader = make_loader(make_tensors(tr_df), shuffle=True)
