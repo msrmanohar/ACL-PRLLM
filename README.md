@@ -23,7 +23,7 @@ The dataset is too large for GitHub. Download from Hugging Face:
 
 ## Setup
 ```bash
-/opt/homebrew/Caskroom/miniforge/base/bin/python3 telugu_style_fixed.py
+"/Users/itscs/Prompt Recovery for LLM in Telugu/telugu_env/bin/python" "/Users/itscs/Prompt Recovery for LLM in Telugu/telugu_style_fixed.py"
 ```
 
 ## Requirements
